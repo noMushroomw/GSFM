@@ -60,7 +60,7 @@ python download_amass.py --login --extract
 python -m scripts.data_processing.amass_preprocess --raw-dir data/amass_raw/extracted --body-models data/body_models --out data/data_3d_amass.npz
 ```
 
-`download_amass.py --login` asks the user to input AMASS account credentials. If the site blocks the scripte downloads, save the archive links from the download page to a .txt file and run `python download_amass.py --from-urls links.txt --extract` instead.
+The script `download_amass.py --login` asks the user to input their AMASS account credentials. If the site blocks the download using the script, save the archive links from the download page to a `.txt` file and run `python download_amass.py --from-urls links.txt --extract` instead.
 
 Place the SMPL+H models under `data/body_models/smplh/{male,female,neutral}/model.npz`.
 
@@ -78,7 +78,7 @@ To train using 4 GPUs and 94,200 steps (100 epochs), run:
 torchrun --standalone --nnodes=1 --nproc_per_node=4 -m scripts.train --config scripts/configs/amass_deep_hpg.yaml
 ```
 
-To train usign a single GPU, run:
+To train using a single GPU, run:
 
 ```bash
 python -m scripts.train --config scripts/configs/amass_deep_hpg.yaml
@@ -90,6 +90,8 @@ Any field in the config can be overridden without directly editing the .yaml fil
 python -m scripts.train --config scripts/configs/amass_deep_hpg.yaml --set flow.sigma_dir=0.7 --run-name gsfm_s070
 ```
 
+The model configurations are as follows:
+
 | config | model |
 |---|---|
 | `amass_deep_hpg.yaml` | GSFM-deep: 12 distinct blocks, 30.49 M parameters, `sigma_d` 0.7 |
@@ -99,7 +101,7 @@ python -m scripts.train --config scripts/configs/amass_deep_hpg.yaml --set flow.
 
 ## Evaluate
 
-For evaluation, we use 0.5 s observed data and 2.0 s predicted data at 60 fps against 50 sampled future trajectors per input observation. To evaluate the velocity field, we use a midpoint solver with 25 steps (50 function evaluations). 
+For evaluation, we use 0.5 s of observed data and 2.0 s of predicted data at 60 fps against 50 sampled future trajectories per input observation. To evaluate the velocity field, we use a midpoint solver with 25 steps (50 function evaluations). 
 
 Using the flag `--pool published` applies the BeLFusion / SkeletonDiffusion AMASS test partition (12,742 windows with prediction windows starting at frame 180 of every test sequence and every 120 frames after it). This configuration matches that of the ZeroVelocity baseline. To evaluate results, run:
 
@@ -107,7 +109,7 @@ Using the flag `--pool published` applies the BeLFusion / SkeletonDiffusion AMAS
 python -m scripts.evaluate --checkpoint runs/amass_deep_hpg/checkpoints/ckpt_last.pt --split test --pool published --num-samples 50 --num-steps 25 --solver midpoint --out runs/amass_deep_hpg/eval_test.json
 ```
 
-Sharded over N GPUs:
+Distributed over N GPUs:
 
 ```bash
 torchrun --standalone --nnodes=1 --nproc_per_node=4 -m scripts.evaluate --checkpoint runs/amass_deep_hpg/checkpoints/ckpt_last.pt --split test --pool published --num-samples 50 --num-steps 25 --solver midpoint --out runs/amass_deep_hpg/eval_test.json
