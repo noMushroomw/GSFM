@@ -99,7 +99,7 @@ The model configurations are as follows:
 | `amass_deep_s030/s050/s070_hpg.yaml` | source scale study on GSFM-deep |
 | `amass_tied_s050/s070_hpg.yaml` | source scale study on GSFM-tied |
 
-## Evaluate
+## Evaluation
 
 For evaluation, we use 0.5 s of observed data and 2.0 s of predicted data at 60 fps against 50 sampled future trajectories per input observation. To evaluate the velocity field, we use a midpoint solver with 25 steps (50 function evaluations). 
 
